@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import path from "path";
 
 // https://vitejs.dev/config
 export default defineConfig({
@@ -7,6 +8,11 @@ export default defineConfig({
       entry: "src/main.ts",
       fileName: "main",
       formats: ["es"],
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

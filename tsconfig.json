@@ -12,16 +12,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "./src/**/*.ts",
-    "vite.main.config.mts",
-    "./vite.preload.config.mts",
-    "vite.renderer.config.mts",
-    "forge.config.mts"
-  ]
+  "exclude": ["eslint.config.js"]
 }
