@@ -4,4 +4,4 @@ type Transaction = {
   amount: number;
   description: string;
   category: string;
-}
+};
