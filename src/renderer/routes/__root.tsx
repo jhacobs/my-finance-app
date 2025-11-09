@@ -8,7 +8,7 @@ const RootRoute = () => (
   <>
     <SidebarProvider>
       <AppSidebar />
-      <main className="px-2 py-4">
+      <main className="px-4 py-4">
         <SidebarTrigger className="mb-2" />
         <AppHeading />
         <Outlet />
