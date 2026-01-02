@@ -90,3 +90,8 @@ typings/
 
 # Electron-Forge
 out/
+
+# Database
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

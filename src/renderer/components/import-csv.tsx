@@ -7,8 +7,8 @@ import { useDropzone } from "react-dropzone";
 
 export default function ImportCSV() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
-    // Do something with the files
+    const filePath = window.electronAPI.getPathOfFile(acceptedFiles[0]);
+    window.electronAPI.importCsv(filePath);
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
