@@ -1,7 +1,9 @@
+import { ImportResult } from "@/csv-import/csv-import";
+
 declare module "*.css";
 
 interface ElectronAPI {
-  importCsv: (filePath: string) => Promise<boolean>;
+  importCsv: (filePath: string) => Promise<ImportResult>;
   getPathOfFile: (file: File) => string;
 }
 

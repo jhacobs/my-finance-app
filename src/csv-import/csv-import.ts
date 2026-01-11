@@ -17,11 +17,29 @@ type TransactionCsvRecord = {
   Tag: string;
 };
 
-export const importCsv = async (filePath: string): Promise<boolean> => {
-  const data = await readCsv(filePath);
-  const normalizedCsvData = normalizeCsvData(data);
-  storeTransactions(normalizedCsvData);
-  return true;
+export type ImportResult = {
+  success: boolean;
+  error?: string;
+};
+
+export const importCsv = async (filePath: string): Promise<ImportResult> => {
+  try {
+    const data = await readCsv(filePath);
+    const normalizedCsvData = normalizeCsvData(data);
+    storeTransactions(normalizedCsvData);
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof CsvError
+          ? `CSV Parsing Error: ${error.message}`
+          : "An unexpected error occurred during CSV import.",
+    };
+  }
+
+  return {
+    success: true,
+  };
 };
 
 const readCsv = (filePath: string): Promise<TransactionCsvRecord[]> => {
@@ -49,9 +67,15 @@ const readCsv = (filePath: string): Promise<TransactionCsvRecord[]> => {
 
 const normalizeCsvData = (data: TransactionCsvRecord[]): Transaction[] => {
   return data.map((record) => {
+    const rawDate = record.Datum;
+    const formattedDate =
+      rawDate && rawDate.length === 8
+        ? `${rawDate.slice(0, 4)}-${rawDate.slice(4, 6)}-${rawDate.slice(6, 8)}`
+        : rawDate;
+
     return {
       id: 0,
-      date: record.Datum,
+      date: formattedDate,
       description: record["Naam / Omschrijving"],
       account: record.Rekening,
       to_account: record.Tegenrekening,
@@ -71,7 +95,6 @@ const normalizeCsvData = (data: TransactionCsvRecord[]): Transaction[] => {
 };
 
 const storeTransactions = (transactions: Transaction[]): void => {
-  // TODO: Handle duplicates
   const db = getDB();
 
   const insertStmt = db.prepare(
