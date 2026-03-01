@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { Suspense, use, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -14,36 +14,100 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { Transaction } from "@/models/transaction";
+import { toTitleCase } from "../helpers/string-format";
+import { nlCurrencyFormatter } from "../helpers/number-format";
 
-const columnHelper = createColumnHelper<Transaction>();
+type RecentTransactionTableRow = {
+  date: string;
+  description: string;
+  amount: number;
+};
+
+const columnHelper = createColumnHelper<RecentTransactionTableRow>();
 
 const columns = [
   columnHelper.accessor("date", {
     header: "Date",
-    cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("description", {
     header: "Description",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("category", {
-    header: "Category",
-    cell: (info) => info.getValue(),
+    cell: (info) => toTitleCase(info.getValue()),
   }),
   columnHelper.accessor("amount", {
     header: "Amount",
-    cell: (info) => info.getValue(),
+    cell: (info) => nlCurrencyFormatter.format(info.getValue()),
   }),
 ];
 
-export default function RecentTransactions() {
-  const [data, setData] = useState<Transaction[]>([]);
+const mapTransactionToTableRow = (
+  transaction: Transaction,
+): RecentTransactionTableRow => {
+  return {
+    date: transaction.date,
+    description: transaction.description,
+    amount:
+      transaction.transaction_type === "income"
+        ? transaction.amount_in_cents / 100
+        : -(transaction.amount_in_cents / 100),
+  };
+};
+
+const RecentTransactionTable = ({
+  transactionPromise,
+}: {
+  transactionPromise: Promise<Transaction[]>;
+}) => {
+  const transactions = use(transactionPromise);
+  const transactionRows = useMemo(
+    () => transactions.map(mapTransactionToTableRow),
+    [transactions],
+  );
 
   const table = useReactTable({
-    data,
+    data: transactionRows,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  return (
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead key={header.id}>
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+export default function RecentTransactions() {
+  const transactionPromise = useMemo(
+    () => window.electronAPI.getLatestTransactions(),
+    [],
+  );
 
   return (
     <Card>
@@ -51,35 +115,9 @@ export default function RecentTransactions() {
         <CardTitle>Recent transactions</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <Suspense fallback={<div>Loading...</div>}>
+          <RecentTransactionTable transactionPromise={transactionPromise} />
+        </Suspense>
       </CardContent>
     </Card>
   );
