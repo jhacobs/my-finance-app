@@ -1,12 +1,17 @@
 import { Upload } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
-import { Input } from "./ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/renderer/components/ui/card";
+import { Input } from "@/renderer/components/ui/input";
 import { useCallback, useState } from "react";
-import clsx from "clsx";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { Spinner } from "./ui/spinner";
-import { getFiles } from "../helpers/dropzone";
+import { Spinner } from "@/renderer/components/ui/spinner";
+import { getFiles } from "@/renderer/helpers/dropzone";
+import { clsx } from "clsx";
 
 export default function ImportCSV() {
   const [isLoading, setIsLoading] = useState(false);

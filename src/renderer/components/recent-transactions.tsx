@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Suspense, use, useMemo } from "react";
+import { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -17,6 +17,13 @@ import {
 import { Transaction } from "@/models/transaction";
 import { toTitleCase } from "../helpers/string-format";
 import { nlCurrencyFormatter } from "../helpers/number-format";
+import { formatTransactionAmount } from "../services/transaction-service";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/renderer/api/query-keys";
+
+type RecentTransactionTableProps = {
+  transactions: Transaction[];
+};
 
 type RecentTransactionTableRow = {
   date: string;
@@ -46,19 +53,13 @@ const mapTransactionToTableRow = (
   return {
     date: transaction.date,
     description: transaction.description,
-    amount:
-      transaction.transaction_type === "income"
-        ? transaction.amount_in_cents / 100
-        : -(transaction.amount_in_cents / 100),
+    amount: formatTransactionAmount(transaction),
   };
 };
 
 const RecentTransactionTable = ({
-  transactionPromise,
-}: {
-  transactionPromise: Promise<Transaction[]>;
-}) => {
-  const transactions = use(transactionPromise);
+  transactions,
+}: RecentTransactionTableProps) => {
   const transactionRows = useMemo(
     () => transactions.map(mapTransactionToTableRow),
     [transactions],
@@ -104,10 +105,10 @@ const RecentTransactionTable = ({
 };
 
 export default function RecentTransactions() {
-  const transactionPromise = useMemo(
-    () => window.electronAPI.getLatestTransactions(),
-    [],
-  );
+  const query = useQuery({
+    queryKey: queryKeys.transactions.recent(),
+    queryFn: () => window.electronAPI.getLatestTransactions(),
+  });
 
   return (
     <Card>
@@ -115,9 +116,9 @@ export default function RecentTransactions() {
         <CardTitle>Recent transactions</CardTitle>
       </CardHeader>
       <CardContent>
-        <Suspense fallback={<div>Loading...</div>}>
-          <RecentTransactionTable transactionPromise={transactionPromise} />
-        </Suspense>
+        {query.isLoading && <p>Loading...</p>}
+
+        {query.data && <RecentTransactionTable transactions={query.data} />}
       </CardContent>
     </Card>
   );

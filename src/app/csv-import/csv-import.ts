@@ -2,6 +2,7 @@ import { getDB } from "@/db/db";
 import { CsvError, parse } from "csv-parse";
 import fs from "node:fs";
 import type { Transaction } from "@/models/transaction";
+import { ImportCSVResult } from "@/models/csv";
 
 type TransactionCsvRecord = {
   Datum: string;
@@ -17,12 +18,7 @@ type TransactionCsvRecord = {
   Tag: string;
 };
 
-export type ImportResult = {
-  success: boolean;
-  error?: string;
-};
-
-export const importCsv = async (filePath: string): Promise<ImportResult> => {
+export const importCsv = async (filePath: string): Promise<ImportCSVResult> => {
   try {
     const data = await readCsv(filePath);
     const normalizedCsvData = normalizeCsvData(data);

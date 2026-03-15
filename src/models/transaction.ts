@@ -1,3 +1,5 @@
+import { DateRangeFilter } from "@/models/filters";
+
 export type Transaction = {
   id: number;
   date: string;
@@ -13,4 +15,8 @@ export type Transaction = {
   tag?: string;
   created_at?: string;
   updated_at?: string;
+};
+
+export type TransactionFilter = {
+  date_range: DateRangeFilter;
 };

@@ -5,20 +5,36 @@ import {
   SidebarHeader,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
-import { Link } from "@tanstack/react-router";
+} from "@/renderer/components/ui/sidebar";
+import {
+  Link,
+  RegisteredRouter,
+  ValidateLinkOptions,
+} from "@tanstack/react-router";
 
-type SidebarItems = {
+type SidebarItems<
+  TRouter extends RegisteredRouter = RegisteredRouter,
+  TOptions = unknown,
+> = {
   title: string;
-  url: string;
+  linkOptions: ValidateLinkOptions<TRouter, TOptions>;
   icon: React.ElementType;
 };
 
 const items: SidebarItems[] = [
   {
     title: "Dashboard",
-    url: "/",
+    linkOptions: {
+      to: "/",
+    },
     icon: LayoutDashboard,
+  },
+  {
+    title: "Transactions",
+    linkOptions: {
+      to: "/transactions",
+    },
+    icon: Wallet,
   },
 ];
 
@@ -38,7 +54,7 @@ export default function AppSidebar() {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
               <Link
-                to={item.url}
+                {...item.linkOptions}
                 className="[&.active]:bg-primary [&.active]:text-white"
               >
                 <item.icon />

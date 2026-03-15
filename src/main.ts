@@ -2,7 +2,7 @@ import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 import dotenv from "dotenv";
-import { handleMainEvents } from "./main-events";
+import { handleMainEvents } from "./app/main-events";
 import { getDB } from "./db/db";
 import { executeMigrations } from "./db/migration";
 

@@ -1,8 +1,11 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
-import AppSidebar from "../components/app-sidebar";
-import AppHeading from "../components/app-heading";
+import {
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/renderer/components/ui/sidebar";
+import AppSidebar from "@/renderer/components/app-sidebar";
+import AppHeading from "@/renderer/components/app-heading";
 
 const RootRoute = () => (
   <>
