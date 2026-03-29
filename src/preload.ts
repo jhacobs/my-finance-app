@@ -10,4 +10,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     pageSize: number,
     filters?: TransactionFilter,
   ) => ipcRenderer.invoke("transactions:paginated", page, pageSize, filters),
+  getTotalIncome: (filters?: TransactionFilter) =>
+    ipcRenderer.invoke("balance:income", filters),
+  getTotalExpense: (filters?: TransactionFilter) =>
+    ipcRenderer.invoke("balance:expense", filters),
 });
