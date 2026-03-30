@@ -5,6 +5,7 @@ import { getPaginatedTransactions } from "@/app/transaction/paginated-transactio
 import { TransactionFilter } from "@/models/transaction";
 import { getTotalIncome } from "./balance/total-income";
 import { getTotalExpense } from "./balance/total-expense";
+import { getTotalBalance } from "./balance/total-balance";
 
 const handleCsvImport = () => {
   ipcMain.handle("csv:import", (event: IpcMainInvokeEvent, filePath: string) =>
@@ -46,10 +47,20 @@ const handleTotalExpense = () => {
   );
 };
 
+const handleTotalBalance = () => {
+  ipcMain.handle(
+    "balance:total",
+    (event: IpcMainInvokeEvent, filters?: TransactionFilter) => {
+      return getTotalBalance(filters);
+    },
+  );
+};
+
 export const handleMainEvents = () => {
   handleCsvImport();
   handleLatestTransactions();
   handlePaginatedTransactions();
   handleTotalIncome();
   handleTotalExpense();
+  handleTotalBalance();
 };

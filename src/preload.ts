@@ -14,4 +14,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("balance:income", filters),
   getTotalExpense: (filters?: TransactionFilter) =>
     ipcRenderer.invoke("balance:expense", filters),
+  getTotalBalance: (filters?: TransactionFilter) =>
+    ipcRenderer.invoke("balance:total", filters),
 });

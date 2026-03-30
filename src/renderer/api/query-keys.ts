@@ -6,5 +6,6 @@ export const queryKeys = {
   balance: {
     totalIncome: ["balance", "totalIncome"] as const,
     totalExpense: ["balance", "totalExpense"] as const,
+    totalBalance: ["balance", "totalBalance"] as const,
   },
 };

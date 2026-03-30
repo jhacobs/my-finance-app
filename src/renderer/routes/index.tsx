@@ -4,8 +4,9 @@ import ImportCSV from "@/renderer/components/import-csv";
 import DateFilters from "../components/date-filters";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
-import TotalIncomeCard from "../components/total-income-card";
-import TotalExpenseCard from "../components/total-expense-card";
+import TotalIncomeCard from "@/renderer/components/total-income-card";
+import TotalExpenseCard from "@/renderer/components/total-expense-card";
+import TotalBalanceCard from "@/renderer/components/total-balance-card";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -18,7 +19,8 @@ function Index() {
     <>
       <DateFilters className="mb-3" onChange={setDateRange}></DateFilters>
 
-      <div className="grid grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <TotalBalanceCard dateRange={dateRange} />
         <TotalIncomeCard dateRange={dateRange} />
         <TotalExpenseCard dateRange={dateRange} />
       </div>

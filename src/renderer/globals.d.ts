@@ -15,6 +15,7 @@ interface ElectronAPI {
   ) => Promise<PaginatedResponse<Transaction>>;
   getTotalIncome: (filters?: TransactionFilter) => Promise<number>;
   getTotalExpense: (filters?: TransactionFilter) => Promise<number>;
+  getTotalBalance: (filters?: TransactionFilter) => Promise<number>;
 }
 
 declare global {
