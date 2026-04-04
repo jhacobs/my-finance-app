@@ -13,7 +13,7 @@ import {
 import { DateRange } from "react-day-picker";
 
 type TotalExpenseCardProps = {
-  dateRange: DateRange | undefined;
+  dateRange: DateRange;
 };
 
 export default function TotalExpenseCard({ dateRange }: TotalExpenseCardProps) {

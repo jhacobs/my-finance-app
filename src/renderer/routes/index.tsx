@@ -17,12 +17,20 @@ function Index() {
 
   return (
     <>
-      <DateFilters className="mb-3" onChange={setDateRange}></DateFilters>
+      <DateFilters
+        className="mb-3"
+        onChange={setDateRange}
+        defaultSelectedFilter="this_month"
+      ></DateFilters>
 
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <TotalBalanceCard dateRange={dateRange} />
-        <TotalIncomeCard dateRange={dateRange} />
-        <TotalExpenseCard dateRange={dateRange} />
+        {dateRange && (
+          <>
+            <TotalBalanceCard dateRange={dateRange} />
+            <TotalIncomeCard dateRange={dateRange} />
+            <TotalExpenseCard dateRange={dateRange} />
+          </>
+        )}
       </div>
 
       <div className="flex gap-4">

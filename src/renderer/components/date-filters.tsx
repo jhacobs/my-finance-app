@@ -4,84 +4,109 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/renderer/components/ui/popover";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { clsx } from "clsx";
 
+type DateFilterType = "previous_month" | "this_month" | "this_year" | "custom";
+
 type DateFiltersProps = {
   onChange: (dateRange: DateRange) => void;
   className?: string;
+  defaultSelectedFilter?: DateFilterType;
 };
-
-type DateFilterType = "previous_month" | "this_month" | "this_year" | "custom";
 
 export default function DateFilters({
   onChange,
   className = "",
+  defaultSelectedFilter = undefined,
 }: DateFiltersProps) {
   const [date, setDate] = useState<DateRange | undefined>(undefined);
+  const [selectedFilter, setSelectedFilter] = useState<
+    DateFilterType | undefined
+  >(defaultSelectedFilter);
 
-  const updateDateFilter = (type: DateFilterType): void => {
-    if (type === "previous_month") {
-      onChange({
-        from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-        to: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
-      });
-      return;
+  const updateDateFilter = useCallback(
+    (type: DateFilterType): void => {
+      if (type === "previous_month") {
+        onChange({
+          from: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth() - 1,
+            1,
+          ),
+          to: new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+        });
+        return;
+      }
+
+      if (type === "this_month") {
+        onChange({
+          from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          to: new Date(),
+        });
+        return;
+      }
+
+      if (type === "this_year") {
+        onChange({
+          from: new Date(new Date().getFullYear(), 0, 1),
+          to: new Date(),
+        });
+        return;
+      }
+
+      if (type === "custom" && date) {
+        onChange(date);
+        return;
+      }
+
+      onChange({ from: undefined, to: undefined });
+    },
+    [date, onChange],
+  );
+
+  useEffect(() => {
+    if (selectedFilter) {
+      updateDateFilter(selectedFilter);
     }
+  }, [selectedFilter, updateDateFilter]);
 
-    if (type === "this_month") {
-      onChange({
-        from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-        to: new Date(),
-      });
-      return;
-    }
-
-    if (type === "this_year") {
-      onChange({
-        from: new Date(new Date().getFullYear(), 0, 1),
-        to: new Date(),
-      });
-      return;
-    }
-
-    if (type === "custom" && date) {
-      onChange(date);
-      return;
-    }
-
-    onChange({ from: undefined, to: undefined });
+  const setDateFilter = (type: DateFilterType): void => {
+    setSelectedFilter(type);
   };
 
   const selectCustomDate = (dateRange: DateRange | undefined): void => {
     setDate(dateRange);
-    updateDateFilter("custom");
+    setDateFilter("custom");
   };
 
   return (
     <div className={clsx("flex gap-3", className)}>
       <Button
-        onClick={() => updateDateFilter("previous_month")}
-        variant="outline"
+        onClick={() => setDateFilter("previous_month")}
+        variant={selectedFilter === "previous_month" ? "default" : "outline"}
         size="sm"
+        className="cursor-pointer"
       >
         Previous month
       </Button>
       <Button
-        onClick={() => updateDateFilter("this_month")}
-        variant="outline"
+        onClick={() => setDateFilter("this_month")}
+        variant={selectedFilter === "this_month" ? "default" : "outline"}
         size="sm"
+        className="cursor-pointer"
       >
         This month
       </Button>
       <Button
-        onClick={() => updateDateFilter("this_year")}
-        variant="outline"
+        onClick={() => setDateFilter("this_year")}
+        variant={selectedFilter === "this_year" ? "default" : "outline"}
         size="sm"
+        className="cursor-pointer"
       >
         This year
       </Button>
@@ -89,8 +114,8 @@ export default function DateFilters({
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
-            className="justify-start px-2.5 font-normal"
+            variant={selectedFilter === "custom" ? "default" : "outline"}
+            className="justify-start px-2.5 font-normal cursor-pointer"
           >
             <CalendarIcon />
             {date?.from ? (

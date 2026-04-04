@@ -13,7 +13,7 @@ import { useTransactionFilter } from "../hooks/use-transaction-filter";
 import { nlCurrencyFormatter } from "../helpers/number-format";
 
 type TotalIncomeCardProps = {
-  dateRange: DateRange | undefined;
+  dateRange: DateRange;
 };
 
 export default function TotalIncomeCard({ dateRange }: TotalIncomeCardProps) {

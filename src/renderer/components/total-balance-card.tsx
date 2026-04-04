@@ -13,7 +13,7 @@ import {
 import { CreditCard } from "lucide-react";
 
 type TotalBalanceCardProps = {
-  dateRange: DateRange | undefined;
+  dateRange: DateRange;
 };
 
 export default function TotalBalanceCard({ dateRange }: TotalBalanceCardProps) {
