@@ -6,6 +6,11 @@ import { TransactionFilter } from "@/models/transaction";
 import { getTotalIncome } from "./balance/total-income";
 import { getTotalExpense } from "./balance/total-expense";
 import { getTotalBalance } from "./balance/total-balance";
+import { loginUser } from "./auth/login";
+import { registerUser } from "./auth/register";
+import { logoutUser } from "./auth/logout";
+import { getAppConfig } from "@/config/config";
+import { encryptionKeyExists } from "./auth/encryption";
 
 const handleCsvImport = () => {
   ipcMain.handle("csv:import", (event: IpcMainInvokeEvent, filePath: string) =>
@@ -56,6 +61,42 @@ const handleTotalBalance = () => {
   );
 };
 
+const handleLoginUser = () => {
+  ipcMain.handle(
+    "auth:login",
+    (event: IpcMainInvokeEvent, password: string) => {
+      return loginUser(password);
+    },
+  );
+};
+
+const handleRegisterUser = () => {
+  ipcMain.handle(
+    "auth:register",
+    (event: IpcMainInvokeEvent, password: string) => {
+      return registerUser(password);
+    },
+  );
+};
+
+const handleLogoutUser = () => {
+  ipcMain.handle("auth:logout", () => {
+    logoutUser();
+  });
+};
+
+const handleOnboardingCompleted = () => {
+  ipcMain.handle("app:onboarding-completed", () => {
+    return getAppConfig().onboardingCompleted;
+  });
+};
+
+const handleUserAuthenticated = () => {
+  ipcMain.handle("app:user-authenticated", () => {
+    return encryptionKeyExists();
+  });
+};
+
 export const handleMainEvents = () => {
   handleCsvImport();
   handleLatestTransactions();
@@ -63,4 +104,9 @@ export const handleMainEvents = () => {
   handleTotalIncome();
   handleTotalExpense();
   handleTotalBalance();
+  handleLoginUser();
+  handleRegisterUser();
+  handleLogoutUser();
+  handleOnboardingCompleted();
+  handleUserAuthenticated();
 };

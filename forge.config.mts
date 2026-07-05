@@ -11,7 +11,9 @@ import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-nati
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    ignore: [/node_modules\/(?!(better-sqlite3|bindings|file-uri-to-path)\/)/],
+    ignore: [
+      /node_modules\/(?!(better-sqlite3-multiple-ciphers|bindings|file-uri-to-path)\/)/,
+    ],
   },
   rebuildConfig: {},
   makers: [

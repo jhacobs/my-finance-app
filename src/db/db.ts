@@ -1,19 +1,22 @@
 import { app } from "electron";
 import { join } from "path";
 import fs from "node:fs";
-import Database from "better-sqlite3";
+import Database from "better-sqlite3-multiple-ciphers";
 import { createMigrationsTable } from "./migration";
+import { encryptionKey } from "@/app/auth/encryption";
+import { sendLoginNeededEvent } from "@/main";
 
 let db: Database.Database | undefined = undefined;
 
 const connectToDatabase = () => {
   const isProd = app.isPackaged;
-  const dbFilename = process.env.DB_FILENAME;
+  const dbFilename = "database.sqlite";
   let shouldCreateMigrationsTable = false;
 
-  if (!dbFilename) {
+  if (!encryptionKey) {
+    sendLoginNeededEvent();
     throw new Error(
-      "DB_FILENAME environment variable is not defined. Please add it to your .env file.",
+      "Encryption key is not available. Please ensure you have completed the authentication process.",
     );
   }
 
@@ -25,15 +28,16 @@ const connectToDatabase = () => {
     shouldCreateMigrationsTable = true;
   }
 
-  const db = new Database(dbPath);
+  const database = new Database(dbPath);
 
-  db.pragma("journal_mode = WAL");
+  database.key(encryptionKey); // Set the encryption key for the database
+  database.pragma("journal_mode = WAL");
 
   if (shouldCreateMigrationsTable) {
-    createMigrationsTable(db);
+    createMigrationsTable(database);
   }
 
-  return db;
+  return database;
 };
 
 export const getDB = () => {

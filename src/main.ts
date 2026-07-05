@@ -1,13 +1,39 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
-import dotenv from "dotenv";
 import { handleMainEvents } from "./app/main-events";
-import { getDB } from "./db/db";
-import { executeMigrations } from "./db/migration";
+import { initializeAppConfig } from "./config/config";
+import { logoutUser } from "./app/auth/logout";
+import { NotificationEventType } from "./models/notification";
 
-// Configure env variables
-dotenv.config();
+let mainWindow: BrowserWindow | null = null;
+
+export const sendOnboardingNeededEvent = () => {
+  if (!mainWindow) {
+    return;
+  }
+
+  mainWindow.webContents.send("auth:onboarding-needed");
+};
+
+export const sendLoginNeededEvent = () => {
+  if (!mainWindow) {
+    return;
+  }
+
+  mainWindow.webContents.send("auth:login-needed");
+};
+
+export const sendNotificationEvent = (
+  type: NotificationEventType,
+  message: string,
+) => {
+  if (!mainWindow) {
+    return;
+  }
+
+  mainWindow.webContents.send(`notification:${type}`, message);
+};
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -16,7 +42,7 @@ if (started) {
 
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     webPreferences: {
@@ -41,8 +67,7 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
-  const db = getDB();
-  executeMigrations(db);
+  initializeAppConfig();
   handleMainEvents();
   createWindow();
 });
@@ -65,7 +90,7 @@ app.on("activate", () => {
 });
 
 app.on("before-quit", () => {
-  getDB().close();
+  logoutUser();
 });
 
 // In this file you can include the rest of your app's specific main process

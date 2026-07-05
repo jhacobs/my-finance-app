@@ -7,16 +7,21 @@ import { DateRange } from "react-day-picker";
 import TotalIncomeCard from "@/renderer/components/total-income-card";
 import TotalExpenseCard from "@/renderer/components/total-expense-card";
 import TotalBalanceCard from "@/renderer/components/total-balance-card";
+import { authMiddleware } from "@/renderer/auth/middleware";
+import MainLayout from "../layout/main-layout";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  beforeLoad: async () => {
+    await authMiddleware();
+  },
 });
 
 function Index() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   return (
-    <>
+    <MainLayout>
       <DateFilters
         className="mb-3"
         onChange={setDateRange}
@@ -37,6 +42,6 @@ function Index() {
         <RecentTransactions />
         <ImportCSV />
       </div>
-    </>
+    </MainLayout>
   );
 }
