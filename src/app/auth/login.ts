@@ -1,6 +1,9 @@
 import { getAppConfig } from "@/config/config";
 import * as argon2 from "argon2";
-import { decryptProtectedEncryptionKey, generateMasterKey } from "./encryption";
+import {
+  decryptProtectedEncryptionKey,
+  generateMasterKey,
+} from "./encryption";
 import { getDB } from "@/db/db";
 import { executeMigrations } from "@/db/migration";
 import { sendNotificationEvent, sendOnboardingNeededEvent } from "@/main";
@@ -34,13 +37,14 @@ const validateUser = async (
   passwordHash: string,
 ): Promise<boolean> => {
   try {
-    const masterKey = await generateMasterKey(password);
-    const isValid = await argon2.verify(
-      passwordHash,
-      masterKey.toString("hex"),
-    );
-    masterKey.fill(0); // Clear master key from memory
-    return isValid;
+    const config = getAppConfig();
+    const masterKey = await generateMasterKey(password, config.masterKeySalt);
+
+    try {
+      return await argon2.verify(passwordHash, masterKey.toString("hex"));
+    } finally {
+      masterKey.fill(0); // Clear master key from memory
+    }
   } catch (error) {
     console.error("Error verifying password:", error);
     return false;

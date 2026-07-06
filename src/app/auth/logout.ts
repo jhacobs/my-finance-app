@@ -1,7 +1,7 @@
-import { getDB } from "@/db/db";
+import { closeDBIfOpen } from "@/db/db";
 import { clearEncryptionKey } from "./encryption";
 
 export const logoutUser = (): void => {
+  closeDBIfOpen();
   clearEncryptionKey();
-  getDB().close();
 };

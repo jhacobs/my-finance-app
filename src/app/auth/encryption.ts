@@ -1,8 +1,12 @@
-import { getAppConfig, updateAppConfig } from "@/config/config";
+import { getAppConfig, updateAppConfigValues } from "@/config/config";
 import * as argon2 from "argon2";
 import crypto from "crypto";
 
-const KEY_DERIVATION_SALT = "my-finance-salt";
+const MASTER_KEY_SALT_BYTES = 16;
+const ENCRYPTION_KEY_BYTES = 32;
+const GCM_INITIALIZATION_VECTOR_BYTES = 12;
+const GCM_AUTH_TAG_BYTES = 16;
+const PROTECTED_KEY_CIPHER = "aes-256-gcm";
 
 export let encryptionKey: Buffer | undefined = undefined;
 
@@ -15,24 +19,20 @@ export const decryptProtectedEncryptionKey = async (
     throw new Error("Protected encryption key not found in config.");
   }
 
-  const [ivHex, protectedKeyHex] = config.protectedEncryptionKey.split(":");
-  const initializationVector = Buffer.from(ivHex, "hex");
-  const protectedEncryptionKey = Buffer.from(protectedKeyHex, "hex");
+  if (!config.masterKeySalt) {
+    throw new Error("Master key salt not found in config.");
+  }
 
-  const masterKey = await generateMasterKey(password);
+  const masterKey = await generateMasterKey(password, config.masterKeySalt);
 
-  const decipher = crypto.createDecipheriv(
-    "aes-256-cbc",
-    masterKey,
-    initializationVector,
-  );
-
-  encryptionKey = Buffer.concat([
-    decipher.update(protectedEncryptionKey),
-    decipher.final(),
-  ]);
-
-  masterKey.fill(0); // Clear master key from memory
+  try {
+    encryptionKey = decryptEncryptionKey(
+      config.protectedEncryptionKey,
+      masterKey,
+    );
+  } finally {
+    masterKey.fill(0); // Clear master key from memory
+  }
 };
 
 export const clearEncryptionKey = (): void => {
@@ -49,43 +49,105 @@ export const encryptionKeyExists = (): boolean => {
 export const generateEncryptionKeys = async (
   password: string,
 ): Promise<void> => {
-  const masterKey = await generateMasterKey(password);
-  await storeMasterKeyAsHash(masterKey);
-  generateProtectedEncryptionKey(masterKey);
+  const masterKeySalt = crypto
+    .randomBytes(MASTER_KEY_SALT_BYTES)
+    .toString("hex");
+  const masterKey = await generateMasterKey(password, masterKeySalt);
 
-  masterKey.fill(0); // Clear master key from memory
+  try {
+    updateAppConfigValues({
+      masterKeySalt,
+      passwordHash: await createMasterKeyHash(masterKey),
+      protectedEncryptionKey: generateProtectedEncryptionKey(masterKey),
+    });
+  } finally {
+    masterKey.fill(0); // Clear master key from memory
+  }
 };
 
-export const generateMasterKey = async (password: string): Promise<Buffer> => {
-  return await argon2.hash(password, {
+export const generateMasterKey = async (
+  password: string,
+  saltHex?: string | null,
+): Promise<Buffer> => {
+  if (!saltHex) {
+    throw new Error("Salt hex is required.");
+  }
+
+  return (await argon2.hash(password, {
     raw: true,
-    salt: Buffer.from(KEY_DERIVATION_SALT),
-  });
+    salt: Buffer.from(saltHex, "hex"),
+  })) as Buffer;
 };
 
-const storeMasterKeyAsHash = async (masterKey: Buffer): Promise<void> => {
-  const hash = await argon2.hash(masterKey.toString("hex"));
-  updateAppConfig("passwordHash", hash);
+const createMasterKeyHash = async (masterKey: Buffer): Promise<string> => {
+  return await argon2.hash(masterKey.toString("hex"));
 };
 
-const generateProtectedEncryptionKey = (masterKey: Buffer): void => {
-  const encryptionKey = crypto.randomBytes(32);
-  const initializationVector = crypto.randomBytes(16);
+const generateProtectedEncryptionKey = (masterKey: Buffer): string => {
+  const generatedEncryptionKey = crypto.randomBytes(ENCRYPTION_KEY_BYTES);
+
+  try {
+    return createProtectedEncryptionKey(masterKey, generatedEncryptionKey);
+  } finally {
+    generatedEncryptionKey.fill(0);
+  }
+};
+
+const createProtectedEncryptionKey = (
+  masterKey: Buffer,
+  generatedEncryptionKey: Buffer,
+): string => {
+  const initializationVector = crypto.randomBytes(
+    GCM_INITIALIZATION_VECTOR_BYTES,
+  );
 
   const cipher = crypto.createCipheriv(
-    "aes-256-cbc",
+    PROTECTED_KEY_CIPHER,
     masterKey,
     initializationVector,
+    { authTagLength: GCM_AUTH_TAG_BYTES },
   );
 
   const protectedEncryptionKey = Buffer.concat([
-    cipher.update(encryptionKey),
+    cipher.update(generatedEncryptionKey),
     cipher.final(),
   ]).toString("hex");
 
-  encryptionKey.fill(0);
+  const authTag = cipher.getAuthTag();
 
-  const protectedEncryptionKeyWithIV = `${initializationVector.toString("hex")}:${protectedEncryptionKey}`;
+  return [
+    "gcm",
+    initializationVector.toString("hex"),
+    protectedEncryptionKey,
+    authTag.toString("hex"),
+  ].join(":");
+};
 
-  updateAppConfig("protectedEncryptionKey", protectedEncryptionKeyWithIV);
+const decryptEncryptionKey = (
+  protectedEncryptionKeyWithIV: string,
+  masterKey: Buffer,
+): Buffer => {
+  const parts = protectedEncryptionKeyWithIV.split(":");
+
+  if (parts[0] !== "gcm") {
+    throw new Error("Protected encryption key has an unsupported format.");
+  }
+
+  const [, ivHex, protectedKeyHex, authTagHex] = parts;
+  if (!ivHex || !protectedKeyHex || !authTagHex) {
+    throw new Error("Protected encryption key has an invalid GCM format.");
+  }
+
+  const decipher = crypto.createDecipheriv(
+    PROTECTED_KEY_CIPHER,
+    masterKey,
+    Buffer.from(ivHex, "hex"),
+    { authTagLength: GCM_AUTH_TAG_BYTES },
+  );
+  decipher.setAuthTag(Buffer.from(authTagHex, "hex"));
+
+  return Buffer.concat([
+    decipher.update(Buffer.from(protectedKeyHex, "hex")),
+    decipher.final(),
+  ]);
 };

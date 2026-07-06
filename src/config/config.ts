@@ -4,6 +4,7 @@ import fs from "node:fs";
 export type AppConfig = {
   passwordHash: string | null;
   protectedEncryptionKey: string | null;
+  masterKeySalt: string | null;
   onboardingCompleted: boolean;
 };
 
@@ -14,6 +15,7 @@ export const initializeAppConfig = (): void => {
     const defaultConfig: AppConfig = {
       passwordHash: null,
       protectedEncryptionKey: null,
+      masterKeySalt: null,
       onboardingCompleted: false,
     };
 
@@ -27,7 +29,14 @@ export const getAppConfig = (): AppConfig => {
   }
 
   const configContent = fs.readFileSync(configPath, "utf-8");
-  return JSON.parse(configContent) as AppConfig;
+  const config = JSON.parse(configContent) as Partial<AppConfig>;
+
+  return {
+    passwordHash: config.passwordHash ?? null,
+    protectedEncryptionKey: config.protectedEncryptionKey ?? null,
+    masterKeySalt: config.masterKeySalt ?? null,
+    onboardingCompleted: config.onboardingCompleted ?? false,
+  };
 };
 
 export const updateAppConfig = <K extends keyof AppConfig>(
@@ -37,4 +46,9 @@ export const updateAppConfig = <K extends keyof AppConfig>(
   const config = getAppConfig();
   config[key] = value;
   fs.writeFileSync(configPath, JSON.stringify(config));
+};
+
+export const updateAppConfigValues = (values: Partial<AppConfig>): void => {
+  const config = getAppConfig();
+  fs.writeFileSync(configPath, JSON.stringify({ ...config, ...values }));
 };

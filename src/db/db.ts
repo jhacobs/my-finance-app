@@ -30,6 +30,7 @@ const connectToDatabase = () => {
 
   const database = new Database(dbPath);
 
+  database.pragma("cipher='chacha20'");
   database.key(encryptionKey); // Set the encryption key for the database
   database.pragma("journal_mode = WAL");
 
@@ -46,4 +47,13 @@ export const getDB = () => {
   }
 
   return db;
+};
+
+export const closeDBIfOpen = () => {
+  if (!db) {
+    return;
+  }
+
+  db.close();
+  db = undefined;
 };
