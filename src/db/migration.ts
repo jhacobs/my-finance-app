@@ -1,4 +1,5 @@
 import Database from "better-sqlite3-multiple-ciphers";
+import { app } from "electron";
 import fs from "node:fs";
 import { join } from "node:path";
 
@@ -7,7 +8,9 @@ type MigrationRow = {
   batch: number;
 };
 
-const migrationFolder = join(process.cwd(), "src/db/migrations/");
+const migrationFolder = app.isPackaged
+  ? join(app.getAppPath(), ".vite/migrations")
+  : join(process.cwd(), "src/db/migrations");
 
 const getMigratedMigrations = (db: Database.Database): MigrationRow[] => {
   const statement = db.prepare<unknown[], MigrationRow>(
@@ -31,7 +34,7 @@ const registerMigration = (db: Database.Database, fileName: string) => {
 
 const migrateMigration = (db: Database.Database, fileName: string) => {
   const migrationSql = fs
-    .readFileSync(`${migrationFolder}${fileName}.sql`)
+    .readFileSync(join(migrationFolder, `${fileName}.sql`))
     .toString();
   const sqlQueries = migrationSql.split(";").filter((query) => query.trim());
 
