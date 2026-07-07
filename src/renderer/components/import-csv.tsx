@@ -40,11 +40,11 @@ export default function ImportCSV() {
   });
 
   return (
-    <Card>
+    <Card className="min-h-full">
       <CardHeader>
         <CardTitle>
           <span className="flex items-center gap-2">
-            <Upload />
+            <Upload className="text-primary" />
             Import Transaction data
           </span>
         </CardTitle>
@@ -68,14 +68,17 @@ export default function ImportCSV() {
                 "p-8",
                 "border-2",
                 "border-dashed",
-                "border-gray-300",
-                "rounded-md",
+                "border-border",
+                "rounded-xl",
                 "flex",
                 "flex-col",
                 "items-center",
                 "gap-4",
                 "transition",
-                isDragActive ? "border-primary" : "border-gray-300",
+                "bg-muted/20",
+                isDragActive
+                  ? "border-primary bg-primary/10"
+                  : "hover:border-primary/50",
               )}
             >
               <div
@@ -84,10 +87,10 @@ export default function ImportCSV() {
                   "p-4",
                   "rounded-full",
                   "transition",
-                  isDragActive && "bg-primary",
+                  isDragActive && "bg-primary text-primary-foreground",
                 )}
               >
-                <Upload color={isDragActive ? "white" : undefined} />
+                <Upload />
               </div>
               <span className="font-semibold">
                 {isDragActive ? "Drop you CSV file here" : "Upload CSV File"}

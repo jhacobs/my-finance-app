@@ -28,7 +28,7 @@ function Index() {
         defaultSelectedFilter="this_month"
       ></DateFilters>
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-3">
         {dateRange && (
           <>
             <TotalBalanceCard dateRange={dateRange} />
@@ -38,7 +38,7 @@ function Index() {
         )}
       </div>
 
-      <div className="flex gap-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
         <RecentTransactions />
         <ImportCSV />
       </div>

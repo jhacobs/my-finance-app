@@ -5,6 +5,7 @@ import { useAppForm } from "../forms/app-form";
 import { LoginForm } from "../schemas/auth-schema";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Wallet } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -45,10 +46,15 @@ function Login() {
   });
 
   return (
-    <main className="flex items-center justify-center h-screen">
-      <div className="flex flex-col items-center justify-center h-full gap-4">
-        <h1 className="text-2xl font-bold">Welcome back to Budget Buddy!</h1>
-        <p className="text-center text-gray-600">
+    <main className="flex min-h-svh items-center justify-center px-4">
+      <div className="flex w-full max-w-md flex-col items-center justify-center gap-5 rounded-2xl border border-border/70 bg-card/90 p-8 shadow-[0_24px_50px_-42px_rgba(79,70,229,0.8)] backdrop-blur">
+        <div className="rounded-2xl bg-primary p-3 text-primary-foreground shadow-[0_16px_34px_-22px_var(--primary)]">
+          <Wallet className="size-7" />
+        </div>
+        <h1 className="text-center text-2xl font-bold tracking-tight">
+          Welcome back!
+        </h1>
+        <p className="text-center text-muted-foreground">
           Please enter your password to access your financial dashboard.
         </p>
 

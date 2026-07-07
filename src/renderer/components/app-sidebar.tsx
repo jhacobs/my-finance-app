@@ -43,10 +43,10 @@ export default function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center">
-          <span className="bg-primary text-white p-1.5 rounded-lg mr-2">
+          <span className="mr-2 rounded-xl bg-primary p-1.5 text-primary-foreground shadow-[0_12px_28px_-18px_var(--primary)]">
             <Wallet className="w-[--spacing(4)] h-[--spacing(4)]" />
           </span>
-          <h1>My finance</h1>
+          <h1 className="font-semibold tracking-tight">My finance</h1>
         </div>
       </SidebarHeader>
       <SidebarContent className="mx-4">
@@ -55,7 +55,7 @@ export default function AppSidebar() {
             <SidebarMenuButton asChild>
               <Link
                 {...item.linkOptions}
-                className="[&.active]:bg-primary [&.active]:text-white"
+                className="[&.active]:bg-primary [&.active]:text-primary-foreground"
               >
                 <item.icon />
                 <span className="text-base">{item.title}</span>

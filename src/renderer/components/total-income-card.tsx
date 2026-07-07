@@ -25,15 +25,19 @@ export default function TotalIncomeCard({ dateRange }: TotalIncomeCardProps) {
   });
 
   return (
-    <Card>
+    <Card className="overflow-hidden border-emerald-400/20">
       <CardHeader>
-        <CardTitle>Total Income</CardTitle>
+        <CardTitle className="text-muted-foreground text-sm font-medium">
+          Total Income
+        </CardTitle>
         <CardAction>
-          <TrendingUp />
+          <TrendingUp className="text-secondary" />
         </CardAction>
       </CardHeader>
       <CardContent>
-        <p>{nlCurrencyFormatter.format(totalIncome.data ?? 0)}</p>
+        <p className="text-2xl font-semibold tracking-tight text-secondary">
+          {nlCurrencyFormatter.format(totalIncome.data ?? 0)}
+        </p>
       </CardContent>
     </Card>
   );

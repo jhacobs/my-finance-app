@@ -111,7 +111,7 @@ export default function RecentTransactions() {
   });
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Recent transactions</CardTitle>
       </CardHeader>

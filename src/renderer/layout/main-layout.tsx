@@ -11,8 +11,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
     <>
       <SidebarProvider>
         <AppSidebar />
-        <main className="px-4 py-4">
-          <SidebarTrigger className="mb-2" />
+        <main className="min-h-svh flex-1 px-5 py-5">
+          <SidebarTrigger className="mb-3 text-muted-foreground hover:text-foreground" />
           <AppHeading />
           {children}
         </main>

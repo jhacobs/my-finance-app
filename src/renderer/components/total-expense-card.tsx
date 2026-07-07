@@ -25,15 +25,19 @@ export default function TotalExpenseCard({ dateRange }: TotalExpenseCardProps) {
   });
 
   return (
-    <Card>
+    <Card className="overflow-hidden border-red-400/20">
       <CardHeader>
-        <CardTitle>Total Expense</CardTitle>
+        <CardTitle className="text-muted-foreground text-sm font-medium">
+          Total Expense
+        </CardTitle>
         <CardAction>
-          <TrendingDown />
+          <TrendingDown className="text-destructive" />
         </CardAction>
       </CardHeader>
       <CardContent>
-        <p>{nlCurrencyFormatter.format(totalExpense.data ?? 0)}</p>
+        <p className="text-2xl font-semibold tracking-tight text-destructive">
+          {nlCurrencyFormatter.format(totalExpense.data ?? 0)}
+        </p>
       </CardContent>
     </Card>
   );

@@ -91,6 +91,9 @@ typings/
 # Electron-Forge
 out/
 
+# Local brainstorming artifacts
+.superpowers/
+
 # Database
 *.sqlite
 *.sqlite-shm
