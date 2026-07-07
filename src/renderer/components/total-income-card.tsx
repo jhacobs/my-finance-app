@@ -20,7 +20,7 @@ export default function TotalIncomeCard({ dateRange }: TotalIncomeCardProps) {
   const filters = useTransactionFilter(dateRange);
 
   const totalIncome = useQuery({
-    queryKey: [...queryKeys.balance.totalIncome, filters],
+    queryKey: [...queryKeys.balance.totalIncome(), filters],
     queryFn: () => window.electronAPI.getTotalIncome(filters),
   });
 

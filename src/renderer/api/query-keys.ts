@@ -4,8 +4,9 @@ export const queryKeys = {
     recent: () => [...queryKeys.transactions.index, "recent"] as const,
   },
   balance: {
-    totalIncome: ["balance", "totalIncome"] as const,
-    totalExpense: ["balance", "totalExpense"] as const,
-    totalBalance: ["balance", "totalBalance"] as const,
+    index: ["balance"] as const,
+    totalIncome: () => [...queryKeys.balance.index, "totalIncome"] as const,
+    totalExpense: () => [...queryKeys.balance.index, "totalExpense"] as const,
+    totalBalance: () => [...queryKeys.balance.index, "totalBalance"] as const,
   },
 };

@@ -20,7 +20,7 @@ export default function TotalBalanceCard({ dateRange }: TotalBalanceCardProps) {
   const filters = useTransactionFilter(dateRange);
 
   const totalBalance = useQuery({
-    queryKey: [...queryKeys.balance.totalBalance, filters],
+    queryKey: [...queryKeys.balance.totalBalance(), filters],
     queryFn: () => window.electronAPI.getTotalBalance(filters),
   });
 

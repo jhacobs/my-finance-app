@@ -20,7 +20,7 @@ export default function TotalExpenseCard({ dateRange }: TotalExpenseCardProps) {
   const filters = useTransactionFilter(dateRange);
 
   const totalExpense = useQuery({
-    queryKey: [...queryKeys.balance.totalExpense, filters],
+    queryKey: [...queryKeys.balance.totalExpense(), filters],
     queryFn: () => window.electronAPI.getTotalExpense(filters),
   });
 

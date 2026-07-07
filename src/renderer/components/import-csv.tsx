@@ -6,31 +6,56 @@ import {
   CardContent,
 } from "@/renderer/components/ui/card";
 import { Input } from "@/renderer/components/ui/input";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Spinner } from "@/renderer/components/ui/spinner";
 import { getFiles } from "@/renderer/helpers/dropzone";
 import { clsx } from "clsx";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/renderer/api/query-keys";
 
 export default function ImportCSV() {
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    setIsLoading(true);
-    const filePath = window.electronAPI.getPathOfFile(acceptedFiles[0]);
-    const result = await window.electronAPI.importCsv(filePath);
+  const { mutate: importCsv, isPending } = useMutation({
+    mutationFn: async (file: File) => {
+      const filePath = window.electronAPI.getPathOfFile(file);
 
-    if (result.success) {
-      toast.success("CSV imported successfully!");
-    }
+      return await window.electronAPI.importCsv(filePath);
+    },
+    onSuccess: async (result) => {
+      if (result.success) {
+        toast.success("CSV imported successfully!");
 
-    if (!result.success && result.error) {
-      toast.error(result.error);
-    }
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.transactions.index,
+          }),
+          queryClient.invalidateQueries({ queryKey: queryKeys.balance.index }),
+        ]);
 
-    setIsLoading(false);
-  }, []);
+        return;
+      }
+
+      if (result.error) {
+        toast.error(result.error);
+      }
+    },
+  });
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+
+      if (!file) {
+        return;
+      }
+
+      importCsv(file);
+    },
+    [importCsv],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -51,7 +76,7 @@ export default function ImportCSV() {
       </CardHeader>
       <CardContent>
         <>
-          {isLoading && (
+          {isPending && (
             <div className="p-8 flex flex-col items-center gap-4">
               <Spinner />
 
@@ -61,7 +86,7 @@ export default function ImportCSV() {
             </div>
           )}
 
-          {!isLoading && (
+          {!isPending && (
             <div
               {...getRootProps()}
               className={clsx(
