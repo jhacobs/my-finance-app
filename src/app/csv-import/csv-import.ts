@@ -22,7 +22,12 @@ export const importCsv = async (filePath: string): Promise<ImportCSVResult> => {
   try {
     const data = await readCsv(filePath);
     const normalizedCsvData = normalizeCsvData(data);
-    storeTransactions(normalizedCsvData);
+    const result = storeTransactions(normalizedCsvData);
+
+    return {
+      success: true,
+      ...result,
+    };
   } catch (error) {
     return {
       success: false,
@@ -32,10 +37,6 @@ export const importCsv = async (filePath: string): Promise<ImportCSVResult> => {
           : "An unexpected error occurred during CSV import.",
     };
   }
-
-  return {
-    success: true,
-  };
 };
 
 const readCsv = (filePath: string): Promise<TransactionCsvRecord[]> => {
@@ -90,7 +91,9 @@ const normalizeCsvData = (data: TransactionCsvRecord[]): Transaction[] => {
   });
 };
 
-const storeTransactions = (transactions: Transaction[]): void => {
+const storeTransactions = (
+  transactions: Transaction[],
+): { insertedCount: number; skippedCount: number } => {
   const db = getDB();
 
   const insertStmt = db.prepare(
@@ -100,8 +103,10 @@ const storeTransactions = (transactions: Transaction[]): void => {
   );
 
   const insertTransactions = db.transaction((transactions: Transaction[]) => {
+    let insertedCount = 0;
+
     for (const transaction of transactions) {
-      insertStmt.run(
+      const result = insertStmt.run(
         transaction.date,
         transaction.description,
         transaction.account,
@@ -114,8 +119,15 @@ const storeTransactions = (transactions: Transaction[]): void => {
         transaction.amount_after_transaction_in_cents,
         transaction.tag,
       );
+
+      insertedCount += result.changes;
     }
+
+    return {
+      insertedCount,
+      skippedCount: transactions.length - insertedCount,
+    };
   });
 
-  insertTransactions(transactions);
+  return insertTransactions(transactions);
 };

@@ -1,4 +1,10 @@
-export type ImportCSVResult = {
-  success: boolean;
-  error?: string;
-};
+export type ImportCSVResult =
+  | {
+      success: true;
+      insertedCount: number;
+      skippedCount: number;
+    }
+  | {
+      success: false;
+      error: string;
+    };

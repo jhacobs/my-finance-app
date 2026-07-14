@@ -25,22 +25,38 @@ export default function ImportCSV() {
       return await window.electronAPI.importCsv(filePath);
     },
     onSuccess: async (result) => {
-      if (result.success) {
-        toast.success("CSV imported successfully!");
-
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.transactions.index,
-          }),
-          queryClient.invalidateQueries({ queryKey: queryKeys.balance.index }),
-        ]);
-
+      if (!result.success) {
+        toast.error(result.error);
         return;
       }
 
-      if (result.error) {
-        toast.error(result.error);
+      const { insertedCount, skippedCount } = result;
+      const transactions = insertedCount === 1 ? "transaction" : "transactions";
+      const duplicates = skippedCount === 1 ? "duplicate" : "duplicates";
+
+      if (insertedCount === 0) {
+        const message = skippedCount
+          ? `No new transactions. Skipped ${skippedCount} ${duplicates}.`
+          : "No transactions found in CSV.";
+
+        toast.info(message);
+        return;
       }
+
+      const skippedMessage = skippedCount
+        ? `; skipped ${skippedCount} ${duplicates}`
+        : "";
+
+      toast.success(
+        `Imported ${insertedCount} ${transactions}${skippedMessage}.`,
+      );
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.transactions.index,
+        }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.balance.index }),
+      ]);
     },
   });
 

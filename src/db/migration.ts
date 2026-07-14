@@ -36,12 +36,9 @@ const migrateMigration = (db: Database.Database, fileName: string) => {
   const migrationSql = fs
     .readFileSync(join(migrationFolder, `${fileName}.sql`))
     .toString();
-  const sqlQueries = migrationSql.split(";").filter((query) => query.trim());
 
   db.transaction(() => {
-    for (const query of sqlQueries) {
-      db.prepare(query).run();
-    }
+    db.exec(migrationSql);
   })();
 
   registerMigration(db, fileName);
@@ -63,7 +60,8 @@ export const executeMigrations = (db: Database.Database) => {
   const foundMigrationFiles = fs
     .readdirSync(migrationFolder, { withFileTypes: true })
     .filter((item) => item.isFile() && item.name.endsWith(".sql"))
-    .map((file) => file.name.replace(".sql", ""));
+    .map((file) => file.name.replace(".sql", ""))
+    .sort();
 
   const migratedMigrations = getMigratedMigrations(db);
 
