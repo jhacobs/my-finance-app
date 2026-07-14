@@ -1,16 +1,20 @@
-import { LayoutDashboard, Wallet } from "lucide-react";
+import { LayoutDashboard, LogOutIcon, Wallet } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/renderer/components/ui/sidebar";
 import {
   Link,
   RegisteredRouter,
+  useNavigate,
   ValidateLinkOptions,
 } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type SidebarItems<
   TRouter extends RegisteredRouter = RegisteredRouter,
@@ -39,6 +43,21 @@ const items: SidebarItems[] = [
 ];
 
 export default function AppSidebar() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { mutate: logout } = useMutation({
+    mutationFn: async () => {
+      return await window.electronAPI.logoutUser();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      navigate({
+        to: "/login",
+      });
+    },
+  });
+
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
@@ -64,6 +83,19 @@ export default function AppSidebar() {
           </SidebarMenuItem>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              className="cursor-pointer"
+              onClick={() => logout()}
+            >
+              <LogOutIcon />
+              <span className="text-base">Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
