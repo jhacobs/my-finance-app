@@ -52,7 +52,7 @@ function AddTransferRuleForm({ onSubmit }: AddTransferRuleFormProps) {
           )}
         />
       </div>
-      <Field className="pt-8">
+      <Field className="w-22 pt-8">
         <form.AppForm>
           <form.SubscribeButton label="Add rule" />
         </form.AppForm>
@@ -104,7 +104,7 @@ function EditTransferRuleForm({
           )}
         />
       </div>
-      <Field className="pt-8">
+      <Field className="pt-8 w-22">
         <form.AppForm>
           <form.SubscribeButton label="Save" />
         </form.AppForm>

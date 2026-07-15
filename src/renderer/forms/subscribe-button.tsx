@@ -11,7 +11,12 @@ export default function SubscribeButton({ label }: SubscribeButtonProps) {
   return (
     <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
       {([canSubmit, isSubmitting]) => (
-        <Button disabled={!canSubmit || isSubmitting}>{label}</Button>
+        <Button
+          className="cursor-pointer"
+          disabled={!canSubmit || isSubmitting}
+        >
+          {label}
+        </Button>
       )}
     </form.Subscribe>
   );
