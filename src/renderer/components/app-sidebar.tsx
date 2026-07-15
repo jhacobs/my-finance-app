@@ -40,18 +40,18 @@ const items: SidebarItems[] = [
     icon: LayoutDashboard,
   },
   {
-    title: "Insights",
-    linkOptions: {
-      to: "/insights",
-    },
-    icon: ChartNoAxesCombined,
-  },
-  {
     title: "Transactions",
     linkOptions: {
       to: "/transactions",
     },
     icon: Wallet,
+  },
+  {
+    title: "Insights",
+    linkOptions: {
+      to: "/insights",
+    },
+    icon: ChartNoAxesCombined,
   },
   {
     title: "Settings",
