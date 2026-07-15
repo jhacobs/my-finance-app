@@ -133,9 +133,6 @@ export default function MonthlyCashFlowChart() {
     <Card>
       <CardHeader>
         <CardTitle>Income, expenses and net cash flow</CardTitle>
-        <CardDescription>
-          Current month and previous 11 calendar months
-        </CardDescription>
       </CardHeader>
       <CardContent>{content}</CardContent>
     </Card>
