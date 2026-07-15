@@ -1,4 +1,5 @@
 import {
+  ChartNoAxesCombined,
   LayoutDashboard,
   LogOutIcon,
   SettingsIcon,
@@ -37,6 +38,13 @@ const items: SidebarItems[] = [
       to: "/",
     },
     icon: LayoutDashboard,
+  },
+  {
+    title: "Insights",
+    linkOptions: {
+      to: "/insights",
+    },
+    icon: ChartNoAxesCombined,
   },
   {
     title: "Transactions",

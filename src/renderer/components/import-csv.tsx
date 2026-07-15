@@ -56,6 +56,7 @@ export default function ImportCSV() {
           queryKey: queryKeys.transactions.index,
         }),
         queryClient.invalidateQueries({ queryKey: queryKeys.balance.index }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.insights.index }),
       ]);
     },
   });

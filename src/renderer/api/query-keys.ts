@@ -9,6 +9,11 @@ export const queryKeys = {
     totalExpense: () => [...queryKeys.balance.index, "totalExpense"] as const,
     totalBalance: () => [...queryKeys.balance.index, "totalBalance"] as const,
   },
+  insights: {
+    index: ["insights"] as const,
+    monthlyCashFlow: () =>
+      [...queryKeys.insights.index, "monthlyCashFlow"] as const,
+  },
   transferRules: {
     index: ["transferRules"] as const,
   },
