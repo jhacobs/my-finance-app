@@ -13,6 +13,8 @@ export const queryKeys = {
     index: ["insights"] as const,
     monthlyCashFlow: () =>
       [...queryKeys.insights.index, "monthlyCashFlow"] as const,
+    monthlyMoneySaved: () =>
+      [...queryKeys.insights.index, "monthlyMoneySaved"] as const,
   },
   transferRules: {
     index: ["transferRules"] as const,

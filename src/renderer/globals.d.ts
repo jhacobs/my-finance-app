@@ -5,7 +5,10 @@ import {
   TransferRule,
   TransferRuleMutationResult,
 } from "@/models/transfer-rule";
-import { MonthlyCashFlowPoint } from "@/models/insight";
+import {
+  MonthlyCashFlowPoint,
+  MonthlyMoneySavedPoint,
+} from "@/models/insight";
 
 declare module "*.css";
 
@@ -24,6 +27,7 @@ interface ElectronAPI {
   getTotalExpense: (filters?: TransactionFilter) => Promise<number>;
   getTotalBalance: (filters?: TransactionFilter) => Promise<number>;
   getMonthlyCashFlowInsight: () => Promise<MonthlyCashFlowPoint[]>;
+  getMonthlyMoneySavedInsight: () => Promise<MonthlyMoneySavedPoint[]>;
   loginUser: (password: string) => Promise<boolean>;
   registerUser: (password: string) => Promise<boolean>;
   logoutUser: () => Promise<void>;

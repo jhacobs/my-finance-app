@@ -18,6 +18,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("balance:total", filters),
   getMonthlyCashFlowInsight: () =>
     ipcRenderer.invoke("insights:monthly-cash-flow"),
+  getMonthlyMoneySavedInsight: () =>
+    ipcRenderer.invoke("insights:monthly-money-saved"),
   loginUser: (password: string) => ipcRenderer.invoke("auth:login", password),
   registerUser: (password: string) =>
     ipcRenderer.invoke("auth:register", password),

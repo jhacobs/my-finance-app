@@ -4,3 +4,8 @@ export type MonthlyCashFlowPoint = {
   expenseInCents: number;
   netCashFlowInCents: number;
 };
+
+export type MonthlyMoneySavedPoint = {
+  month: string;
+  savedInCents: number;
+};

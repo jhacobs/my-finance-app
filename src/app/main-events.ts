@@ -18,6 +18,7 @@ import { logoutUser } from "./auth/logout";
 import { getAppConfig } from "@/config/config";
 import { encryptionKeyExists } from "./auth/encryption";
 import { getMonthlyCashFlowInsight } from "./insight/monthly-cash-flow";
+import { getMonthlyMoneySavedInsight } from "./insight/monthly-money-saved";
 
 const handleCsvImport = () => {
   ipcMain.handle("csv:import", (event: IpcMainInvokeEvent, filePath: string) =>
@@ -127,6 +128,12 @@ const handleMonthlyCashFlowInsight = () => {
   );
 };
 
+const handleMonthlyMoneySavedInsight = () => {
+  ipcMain.handle("insights:monthly-money-saved", () =>
+    getMonthlyMoneySavedInsight(),
+  );
+};
+
 export const handleMainEvents = () => {
   handleCsvImport();
   handleLatestTransactions();
@@ -141,4 +148,5 @@ export const handleMainEvents = () => {
   handleUserAuthenticated();
   handleTransferRules();
   handleMonthlyCashFlowInsight();
+  handleMonthlyMoneySavedInsight();
 };
