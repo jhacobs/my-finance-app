@@ -28,7 +28,7 @@ export default function TotalBalanceCard({ dateRange }: TotalBalanceCardProps) {
     <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle className="text-muted-foreground text-sm font-medium">
-          Total Balance
+          Net Cash Flow
         </CardTitle>
         <CardAction>
           <CreditCard className="text-primary" />
