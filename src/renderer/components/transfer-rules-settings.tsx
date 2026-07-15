@@ -1,6 +1,7 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { TransferRule } from "@/models/transfer-rule";
 import { queryKeys } from "@/renderer/api/query-keys";
 import { Button } from "@/renderer/components/ui/button";
 import {
@@ -9,13 +10,124 @@ import {
   CardHeader,
   CardTitle,
 } from "@/renderer/components/ui/card";
-import { Input } from "@/renderer/components/ui/input";
+import { Field } from "@/renderer/components/ui/field";
+import { useAppForm } from "@/renderer/forms/app-form";
+import { TransferRuleFormSchema } from "@/renderer/schemas/transfer-rule-schema";
+
+type AddTransferRuleFormProps = {
+  onSubmit: (value: string) => Promise<boolean>;
+};
+
+function AddTransferRuleForm({ onSubmit }: AddTransferRuleFormProps) {
+  const form = useAppForm({
+    defaultValues: { value: "" },
+    validators: { onSubmit: TransferRuleFormSchema },
+    onSubmit: async ({ value }) => {
+      const success = await onSubmit(value.value);
+
+      if (success) {
+        form.reset();
+      }
+    },
+  });
+
+  return (
+    <form
+      className="flex items-end gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <div className="flex-1">
+        <form.AppField
+          name="value"
+          children={(field) => (
+            <field.InputField
+              id="new-transfer-rule"
+              label="Transfer description"
+              type="text"
+              placeholder="For example, J Jansen"
+            />
+          )}
+        />
+      </div>
+      <Field>
+        <form.AppForm>
+          <form.SubscribeButton label="Add rule" />
+        </form.AppForm>
+      </Field>
+    </form>
+  );
+}
+
+type EditTransferRuleFormProps = {
+  rule: TransferRule;
+  onSubmit: (value: string) => Promise<boolean>;
+  onCancel: () => void;
+};
+
+function EditTransferRuleForm({
+  rule,
+  onSubmit,
+  onCancel,
+}: EditTransferRuleFormProps) {
+  const form = useAppForm({
+    defaultValues: { value: rule.value },
+    validators: { onSubmit: TransferRuleFormSchema },
+    onSubmit: async ({ value }) => {
+      const success = await onSubmit(value.value);
+
+      if (success) {
+        onCancel();
+      }
+    },
+  });
+
+  return (
+    <form
+      className="flex items-end gap-2"
+      onSubmit={(event) => {
+        event.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <div className="flex-1">
+        <form.AppField
+          name="value"
+          children={(field) => (
+            <field.InputField
+              id={`transfer-rule-${rule.id}`}
+              label="Transfer description"
+              type="text"
+            />
+          )}
+        />
+      </div>
+      <Field>
+        <form.AppForm>
+          <form.SubscribeButton label="Save" />
+        </form.AppForm>
+      </Field>
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+        )}
+      </form.Subscribe>
+    </form>
+  );
+}
 
 export default function TransferRulesSettings() {
   const queryClient = useQueryClient();
-  const [newValue, setNewValue] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const rules = useQuery({
@@ -43,7 +155,6 @@ export default function TransferRulesSettings() {
         return;
       }
 
-      setNewValue("");
       await refreshAffectedQueries();
       toast.success("Transfer rule added.");
     },
@@ -59,8 +170,6 @@ export default function TransferRulesSettings() {
         return;
       }
 
-      setEditingId(null);
-      setEditingValue("");
       await refreshAffectedQueries();
       toast.success("Transfer rule updated.");
     },
@@ -82,14 +191,25 @@ export default function TransferRulesSettings() {
     onSettled: () => setDeletingId(null),
   });
 
-  const submitNewRule = (event: FormEvent) => {
-    event.preventDefault();
-    createRule.mutate(newValue);
+  const createTransferRule = async (value: string): Promise<boolean> => {
+    try {
+      const result = await createRule.mutateAsync(value);
+      return result.success;
+    } catch {
+      return false;
+    }
   };
 
-  const submitEditedRule = (event: FormEvent, id: number) => {
-    event.preventDefault();
-    updateRule.mutate({ id, value: editingValue });
+  const updateTransferRule = async (
+    id: number,
+    value: string,
+  ): Promise<boolean> => {
+    try {
+      const result = await updateRule.mutateAsync({ id, value });
+      return result.success;
+    } catch {
+      return false;
+    }
   };
 
   return (
@@ -104,20 +224,7 @@ export default function TransferRulesSettings() {
           occur anywhere in the description.
         </p>
 
-        <form className="flex gap-2" onSubmit={submitNewRule}>
-          <Input
-            aria-label="Transfer description"
-            value={newValue}
-            onChange={(event) => setNewValue(event.target.value)}
-            placeholder="For example, JHA Aretz"
-          />
-          <Button
-            type="submit"
-            disabled={!newValue.trim() || createRule.isPending}
-          >
-            Add rule
-          </Button>
-        </form>
+        <AddTransferRuleForm onSubmit={createTransferRule} />
 
         {rules.isLoading && (
           <p className="text-sm text-muted-foreground">Loading rules...</p>
@@ -142,34 +249,12 @@ export default function TransferRulesSettings() {
 
             if (isEditing) {
               return (
-                <form
-                  className="flex gap-2"
+                <EditTransferRuleForm
                   key={rule.id}
-                  onSubmit={(event) => submitEditedRule(event, rule.id)}
-                >
-                  <Input
-                    aria-label={`Edit ${rule.value}`}
-                    value={editingValue}
-                    onChange={(event) => setEditingValue(event.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={!editingValue.trim() || updateRule.isPending}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={updateRule.isPending}
-                    onClick={() => {
-                      setEditingId(null);
-                      setEditingValue("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </form>
+                  rule={rule}
+                  onSubmit={(value) => updateTransferRule(rule.id, value)}
+                  onCancel={() => setEditingId(null)}
+                />
               );
             }
 
@@ -184,10 +269,7 @@ export default function TransferRulesSettings() {
                     type="button"
                     variant="outline"
                     disabled={isDeleting}
-                    onClick={() => {
-                      setEditingId(rule.id);
-                      setEditingValue(rule.value);
-                    }}
+                    onClick={() => setEditingId(rule.id)}
                   >
                     Edit
                   </Button>
