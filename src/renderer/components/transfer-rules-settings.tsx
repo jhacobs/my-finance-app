@@ -33,7 +33,7 @@ function AddTransferRuleForm({ onSubmit }: AddTransferRuleFormProps) {
 
   return (
     <form
-      className="flex items-end gap-2"
+      className="flex items-start gap-2"
       onSubmit={(event) => {
         event.preventDefault();
         form.handleSubmit();
@@ -52,7 +52,7 @@ function AddTransferRuleForm({ onSubmit }: AddTransferRuleFormProps) {
           )}
         />
       </div>
-      <Field>
+      <Field className="pt-8">
         <form.AppForm>
           <form.SubscribeButton label="Add rule" />
         </form.AppForm>
@@ -86,7 +86,7 @@ function EditTransferRuleForm({
 
   return (
     <form
-      className="flex items-end gap-2"
+      className="flex items-start gap-2"
       onSubmit={(event) => {
         event.preventDefault();
         form.handleSubmit();
@@ -104,7 +104,7 @@ function EditTransferRuleForm({
           )}
         />
       </div>
-      <Field>
+      <Field className="pt-8">
         <form.AppForm>
           <form.SubscribeButton label="Save" />
         </form.AppForm>
@@ -112,6 +112,7 @@ function EditTransferRuleForm({
       <form.Subscribe selector={(state) => state.isSubmitting}>
         {(isSubmitting) => (
           <Button
+            className="mt-8"
             type="button"
             variant="outline"
             disabled={isSubmitting}
