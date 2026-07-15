@@ -9,6 +9,7 @@ export const getTotalIncome = (filters?: TransactionFilter): number => {
     SELECT SUM(amount_in_cents) as total_income
     FROM transactions
     WHERE transaction_type = 'income'
+    AND is_transfer = 0
     ${filters ? "AND date BETWEEN ? AND ?" : ""}
   `;
 

@@ -10,6 +10,7 @@ export const getTotalBalance = (filters?: TransactionFilter): number => {
         (
           SELECT SUM(amount_in_cents)
           FROM transactions WHERE transaction_type = 'income'
+          AND is_transfer = 0
           ${filters ? "AND date BETWEEN ? AND ?" : ""}
         )
           -
@@ -17,6 +18,7 @@ export const getTotalBalance = (filters?: TransactionFilter): number => {
           SELECT SUM(amount_in_cents)
           FROM transactions
           WHERE transaction_type = 'expense'
+          AND is_transfer = 0
           ${filters ? "AND date BETWEEN ? AND ?" : ""}
         )
         AS total_balance

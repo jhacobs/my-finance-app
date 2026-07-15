@@ -2,6 +2,12 @@ import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { importCsv } from "@/app/csv-import/csv-import";
 import { getLatestTransactions } from "@/app/transaction/latest-transactions";
 import { getPaginatedTransactions } from "@/app/transaction/paginated-transactions";
+import {
+  createTransferRule,
+  deleteTransferRule,
+  getTransferRules,
+  updateTransferRule,
+} from "@/app/transfer/transfer-rules";
 import { TransactionFilter } from "@/models/transaction";
 import { getTotalIncome } from "./balance/total-income";
 import { getTotalExpense } from "./balance/total-expense";
@@ -97,6 +103,23 @@ const handleUserAuthenticated = () => {
   });
 };
 
+const handleTransferRules = () => {
+  ipcMain.handle("transfer-rules:list", () => getTransferRules());
+  ipcMain.handle(
+    "transfer-rules:create",
+    (_event: IpcMainInvokeEvent, value: string) => createTransferRule(value),
+  );
+  ipcMain.handle(
+    "transfer-rules:update",
+    (_event: IpcMainInvokeEvent, id: number, value: string) =>
+      updateTransferRule(id, value),
+  );
+  ipcMain.handle(
+    "transfer-rules:delete",
+    (_event: IpcMainInvokeEvent, id: number) => deleteTransferRule(id),
+  );
+};
+
 export const handleMainEvents = () => {
   handleCsvImport();
   handleLatestTransactions();
@@ -109,4 +132,5 @@ export const handleMainEvents = () => {
   handleLogoutUser();
   handleOnboardingCompleted();
   handleUserAuthenticated();
+  handleTransferRules();
 };

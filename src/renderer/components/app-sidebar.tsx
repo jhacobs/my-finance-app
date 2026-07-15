@@ -1,4 +1,9 @@
-import { LayoutDashboard, LogOutIcon, Wallet } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOutIcon,
+  SettingsIcon,
+  Wallet,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -39,6 +44,13 @@ const items: SidebarItems[] = [
       to: "/transactions",
     },
     icon: Wallet,
+  },
+  {
+    title: "Settings",
+    linkOptions: {
+      to: "/settings",
+    },
+    icon: SettingsIcon,
   },
 ];
 

@@ -9,6 +9,7 @@ export const getTotalExpense = (filters?: TransactionFilter): number => {
       SELECT SUM(amount_in_cents) as total_expense
       FROM transactions
       WHERE transaction_type = 'expense'
+      AND is_transfer = 0
       ${filters ? "AND date BETWEEN ? AND ?" : ""}
     `;
 

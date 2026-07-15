@@ -8,6 +8,7 @@ export type Transaction = {
   to_account?: string;
   code: string;
   transaction_type: "income" | "expense";
+  is_transfer: boolean;
   amount_in_cents: number;
   mutation_type: string;
   remarks?: string;

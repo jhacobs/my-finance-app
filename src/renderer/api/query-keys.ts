@@ -9,4 +9,7 @@ export const queryKeys = {
     totalExpense: () => [...queryKeys.balance.index, "totalExpense"] as const,
     totalBalance: () => [...queryKeys.balance.index, "totalBalance"] as const,
   },
+  transferRules: {
+    index: ["transferRules"] as const,
+  },
 };

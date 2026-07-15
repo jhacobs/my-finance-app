@@ -22,6 +22,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   logoutUser: () => ipcRenderer.invoke("auth:logout"),
   onboardingCompleted: () => ipcRenderer.invoke("app:onboarding-completed"),
   userAuthenticated: () => ipcRenderer.invoke("app:user-authenticated"),
+  getTransferRules: () => ipcRenderer.invoke("transfer-rules:list"),
+  createTransferRule: (value: string) =>
+    ipcRenderer.invoke("transfer-rules:create", value),
+  updateTransferRule: (id: number, value: string) =>
+    ipcRenderer.invoke("transfer-rules:update", id, value),
+  deleteTransferRule: (id: number) =>
+    ipcRenderer.invoke("transfer-rules:delete", id),
   onErrorNotification: (callback: (message: string) => void) =>
     ipcRenderer.on("notification:error", (_event, message) =>
       callback(message),

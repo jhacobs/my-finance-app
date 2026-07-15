@@ -39,9 +39,8 @@ const migrateMigration = (db: Database.Database, fileName: string) => {
 
   db.transaction(() => {
     db.exec(migrationSql);
+    registerMigration(db, fileName);
   })();
-
-  registerMigration(db, fileName);
 };
 
 export const createMigrationsTable = (db: Database.Database) => {

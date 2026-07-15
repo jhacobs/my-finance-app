@@ -3,6 +3,11 @@ import { CsvError, parse } from "csv-parse";
 import fs from "node:fs";
 import type { Transaction } from "@/models/transaction";
 import { ImportCSVResult } from "@/models/csv";
+import {
+  getTransferRules,
+  isTransferDescription,
+} from "@/app/transfer/transfer-rules";
+import { TransferRule } from "@/models/transfer-rule";
 
 type TransactionCsvRecord = {
   Datum: string;
@@ -21,7 +26,7 @@ type TransactionCsvRecord = {
 export const importCsv = async (filePath: string): Promise<ImportCSVResult> => {
   try {
     const data = await readCsv(filePath);
-    const normalizedCsvData = normalizeCsvData(data);
+    const normalizedCsvData = normalizeCsvData(data, getTransferRules());
     const result = storeTransactions(normalizedCsvData);
 
     return {
@@ -62,7 +67,10 @@ const readCsv = (filePath: string): Promise<TransactionCsvRecord[]> => {
   });
 };
 
-const normalizeCsvData = (data: TransactionCsvRecord[]): Transaction[] => {
+const normalizeCsvData = (
+  data: TransactionCsvRecord[],
+  transferRules: TransferRule[],
+): Transaction[] => {
   return data.map((record) => {
     const rawDate = record.Datum;
     const formattedDate =
@@ -78,6 +86,10 @@ const normalizeCsvData = (data: TransactionCsvRecord[]): Transaction[] => {
       to_account: record.Tegenrekening,
       code: record.Code,
       transaction_type: record["Af Bij"] === "Bij" ? "income" : "expense",
+      is_transfer: isTransferDescription(
+        record["Naam / Omschrijving"],
+        transferRules,
+      ),
       amount_in_cents: Math.round(
         parseFloat(record["Bedrag (EUR)"].replace(",", ".")) * 100,
       ),
@@ -98,8 +110,8 @@ const storeTransactions = (
 
   const insertStmt = db.prepare(
     `INSERT INTO transactions
-    (date, description, account, to_account, code, transaction_type, amount_in_cents, mutation_type, remarks, amount_after_transaction_in_cents, tag)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    (date, description, account, to_account, code, transaction_type, is_transfer, amount_in_cents, mutation_type, remarks, amount_after_transaction_in_cents, tag)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   );
 
   const insertTransactions = db.transaction((transactions: Transaction[]) => {
@@ -113,6 +125,7 @@ const storeTransactions = (
         transaction.to_account,
         transaction.code,
         transaction.transaction_type,
+        Number(transaction.is_transfer),
         transaction.amount_in_cents,
         transaction.mutation_type,
         transaction.remarks,

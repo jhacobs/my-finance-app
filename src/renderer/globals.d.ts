@@ -1,6 +1,10 @@
 import { ImportCSVResult } from "@/models/csv";
 import { PaginatedResponse } from "@/models/responses";
 import { Transaction, TransactionFilter } from "@/models/transaction";
+import {
+  TransferRule,
+  TransferRuleMutationResult,
+} from "@/models/transfer-rule";
 
 declare module "*.css";
 
@@ -23,6 +27,13 @@ interface ElectronAPI {
   logoutUser: () => Promise<void>;
   onboardingCompleted: () => Promise<boolean>;
   userAuthenticated: () => Promise<boolean>;
+  getTransferRules: () => Promise<TransferRule[]>;
+  createTransferRule: (value: string) => Promise<TransferRuleMutationResult>;
+  updateTransferRule: (
+    id: number,
+    value: string,
+  ) => Promise<TransferRuleMutationResult>;
+  deleteTransferRule: (id: number) => Promise<TransferRuleMutationResult>;
   onErrorNotification: (callback: (message: string) => void) => void;
   onSuccessNotification: (callback: (message: string) => void) => void;
   onInfoNotification: (callback: (message: string) => void) => void;

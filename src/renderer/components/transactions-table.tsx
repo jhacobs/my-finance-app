@@ -37,6 +37,7 @@ type TransactionTableRow = {
   amount: number;
   mutationType: string;
   remarks: string;
+  isTransfer: boolean;
 };
 
 const columnHelper = createColumnHelper<TransactionTableRow>();
@@ -56,6 +57,15 @@ const columns = [
   columnHelper.accessor("mutationType", {
     header: "Mutation Type",
   }),
+  columnHelper.accessor("isTransfer", {
+    header: "Classification",
+    cell: (info) =>
+      info.getValue() ? (
+        <span className="rounded-full bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-600">
+          Transfer
+        </span>
+      ) : null,
+  }),
 ];
 
 const mapTransactionToTableRow = (
@@ -67,6 +77,7 @@ const mapTransactionToTableRow = (
     amount: formatTransactionAmount(transaction),
     mutationType: transaction.transaction_type,
     remarks: transaction.remarks || "",
+    isTransfer: Boolean(transaction.is_transfer),
   };
 };
 

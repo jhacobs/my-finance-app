@@ -99,3 +99,5 @@ out/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+
+.superpowers

@@ -29,6 +29,7 @@ type RecentTransactionTableRow = {
   date: string;
   description: string;
   amount: number;
+  isTransfer: boolean;
 };
 
 const columnHelper = createColumnHelper<RecentTransactionTableRow>();
@@ -45,6 +46,15 @@ const columns = [
     header: "Amount",
     cell: (info) => nlCurrencyFormatter.format(info.getValue()),
   }),
+  columnHelper.accessor("isTransfer", {
+    header: "Classification",
+    cell: (info) =>
+      info.getValue() ? (
+        <span className="rounded-full bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-600">
+          Transfer
+        </span>
+      ) : null,
+  }),
 ];
 
 const mapTransactionToTableRow = (
@@ -54,6 +64,7 @@ const mapTransactionToTableRow = (
     date: transaction.date,
     description: transaction.description,
     amount: formatTransactionAmount(transaction),
+    isTransfer: Boolean(transaction.is_transfer),
   };
 };
 
