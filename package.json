@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "A local desktop app for tracking personal finances.",
   "author": "Jacob Aretz",
+  "license": "GPL-3.0-only",
   "homepage": "https://github.com/jhacobs/my-finance-app",
   "repository": {
     "type": "git",
