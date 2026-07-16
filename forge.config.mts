@@ -150,6 +150,18 @@ const config: ForgeConfig = {
     new MakerDeb({}),
     new MakerDMG({}),
   ],
+  publishers: [
+    {
+      name: "@electron-forge/publisher-github",
+      config: {
+        repository: {
+          owner: "jhacobs",
+          name: "my-finance-app",
+        },
+        prerelease: true,
+      },
+    },
+  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new VitePlugin({
