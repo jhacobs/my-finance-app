@@ -1,4 +1,3 @@
-import "./config/user-data-path";
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
