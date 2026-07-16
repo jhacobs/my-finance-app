@@ -1,7 +1,7 @@
 {
   "name": "my-finance",
   "productName": "My Finance App",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A local desktop app for tracking personal finances.",
   "author": "Jacob Aretz",
   "license": "GPL-3.0-only",
