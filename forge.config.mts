@@ -96,10 +96,16 @@ const removeNonRuntimeNativeFiles = (buildPath: string) => {
   ].forEach((relativePath) => removePackagedPath(buildPath, relativePath));
 };
 
+const iconBasePath = path.resolve("assets/icons/icon");
+const macIconPath = `${iconBasePath}.icns`;
+const windowsIconPath = `${iconBasePath}.ico`;
+const linuxIconPath = `${iconBasePath}.png`;
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     appBundleId: "com.jhacobs.my-finance",
+    icon: iconBasePath,
     ignore: shouldIgnorePackagedPath,
   },
   rebuildConfig: {},
@@ -151,11 +157,22 @@ const config: ForgeConfig = {
       name: "MyFinanceApp",
       authors: "Jacob Aretz",
       description: "A local desktop app for tracking personal finances.",
+      setupIcon: windowsIconPath,
     }),
     new MakerZIP({}, ["darwin"]),
-    new MakerRpm({}),
-    new MakerDeb({}),
-    new MakerDMG({}),
+    new MakerRpm({
+      options: {
+        icon: linuxIconPath,
+      },
+    }),
+    new MakerDeb({
+      options: {
+        icon: linuxIconPath,
+      },
+    }),
+    new MakerDMG({
+      icon: macIconPath,
+    }),
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),

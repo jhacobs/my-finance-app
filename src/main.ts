@@ -49,6 +49,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    icon: "/assets/icons/icon.png",
     webPreferences: {
       preload: path.resolve(app.getAppPath(), ".vite/build/preload.js"),
     },
