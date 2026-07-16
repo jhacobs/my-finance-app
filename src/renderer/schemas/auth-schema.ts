@@ -1,15 +1,16 @@
 import * as z from "zod";
 
-// Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const passwordSchema = z
+  .string()
+  .min(8, { error: "Password must be at least 8 characters long" })
+  .regex(/[a-z]/, { error: "Password must include a lowercase letter" })
+  .regex(/[A-Z]/, { error: "Password must include an uppercase letter" })
+  .regex(/\d/, { error: "Password must include a number" })
+  .regex(/[^A-Za-z0-9\s]/, { error: "Password must include a symbol" });
 
 export const OnboardingForm = z
   .object({
-    password: z.string().regex(passwordRegex, {
-      message:
-        "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and special characters.",
-    }),
+    password: passwordSchema,
     confirm: z.string(),
   })
   .refine((data) => data.password === data.confirm, {
