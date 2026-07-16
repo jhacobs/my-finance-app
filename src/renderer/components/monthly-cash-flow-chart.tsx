@@ -18,7 +18,6 @@ import { nlCurrencyFormatter } from "@/renderer/helpers/number-format";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/renderer/components/ui/card";
