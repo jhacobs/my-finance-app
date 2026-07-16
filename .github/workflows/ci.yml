@@ -38,7 +38,7 @@ jobs:
       matrix:
         include:
           - name: Windows x64
-            runner: windows-latest
+            runner: windows-2022
             arch: x64
           - name: macOS x64
             runner: macos-15-intel

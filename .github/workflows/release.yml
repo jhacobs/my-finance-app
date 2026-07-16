@@ -41,7 +41,7 @@ jobs:
         include:
           - name: Windows x64
             platform: windows
-            runner: windows-latest
+            runner: windows-2022
             arch: x64
             artifact: windows-x64
           - name: macOS x64
