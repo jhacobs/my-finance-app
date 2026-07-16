@@ -20,6 +20,7 @@ const packagedPathPrefixes = [
   "/node_modules/better-sqlite3-multiple-ciphers",
   "/node_modules/bindings",
   "/node_modules/file-uri-to-path",
+  "/node_modules/node-addon-api",
   "/node_modules/node-gyp-build",
 ];
 
@@ -29,6 +30,7 @@ const packagedTopLevelModules = new Set([
   "better-sqlite3-multiple-ciphers",
   "bindings",
   "file-uri-to-path",
+  "node-addon-api",
   "node-gyp-build",
 ]);
 
@@ -97,6 +99,7 @@ const removeNonRuntimeNativeFiles = (buildPath: string) => {
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    appBundleId: "com.jhacobs.my-finance",
     ignore: shouldIgnorePackagedPath,
   },
   rebuildConfig: {},
@@ -144,23 +147,15 @@ const config: ForgeConfig = {
     },
   },
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      name: "MyFinanceApp",
+      authors: "Jacob Aretz",
+      description: "A local desktop app for tracking personal finances.",
+    }),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),
     new MakerDMG({}),
-  ],
-  publishers: [
-    {
-      name: "@electron-forge/publisher-github",
-      config: {
-        repository: {
-          owner: "jhacobs",
-          name: "my-finance-app",
-        },
-        prerelease: true,
-      },
-    },
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
