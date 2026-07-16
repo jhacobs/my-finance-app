@@ -105,6 +105,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     appBundleId: "com.jhacobs.my-finance",
+    executableName: "my-finance",
     icon: iconBasePath,
     ignore: shouldIgnorePackagedPath,
   },
