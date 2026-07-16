@@ -47,19 +47,21 @@ createRoot(document.getElementById("root")!).render(
       <TooltipProvider>
         <RouterProvider router={router} />
         <Toaster />
-        <TanStackDevtools
-          plugins={[
-            formDevtoolsPlugin(),
-            {
-              name: "TanStack Query",
-              render: <ReactQueryDevtools />,
-            },
-            {
-              name: "TanStack Router",
-              render: <TanStackRouterDevtools router={router} />,
-            },
-          ]}
-        />
+        {import.meta.env.DEV && (
+          <TanStackDevtools
+            plugins={[
+              formDevtoolsPlugin(),
+              {
+                name: "TanStack Query",
+                render: <ReactQueryDevtools />,
+              },
+              {
+                name: "TanStack Router",
+                render: <TanStackRouterDevtools router={router} />,
+              },
+            ]}
+          />
+        )}
       </TooltipProvider>
     </QueryClientProvider>
   </StrictMode>,
