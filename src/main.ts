@@ -53,6 +53,7 @@ const createWindow = () => {
     webPreferences: {
       preload: path.resolve(app.getAppPath(), ".vite/build/preload.js"),
     },
+    autoHideMenuBar: true,
   });
 
   // and load the index.html of the app.
